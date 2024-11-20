@@ -13,4 +13,9 @@ class VideoCache {
   Future<String> convertToCacheProxyUrl(String url) async {
     return _hostApi.convertToCacheProxyUrl(url);
   }
+  
+  /// 获取转码地址
+  Future<String> getTransCodeUrl(String url, Map<String, String> headers) async {
+    return _hostApi.getTransCodeUrl(url, headers);
+  }
 }

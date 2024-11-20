@@ -57,6 +57,7 @@ android {
         implementation 'com.danikula:videocache:2.7.1'
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.0.0'
+        implementation 'com.android.support:multidex:1.0.0'
     }
 
     testOptions {

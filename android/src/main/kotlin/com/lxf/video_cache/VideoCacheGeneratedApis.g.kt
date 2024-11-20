@@ -7,8 +7,6 @@ import io.flutter.plugin.common.BasicMessageChannel
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MessageCodec
 import io.flutter.plugin.common.StandardMessageCodec
-import java.io.ByteArrayOutputStream
-import java.nio.ByteBuffer
 
 private fun wrapResult(result: Any?): List<Any?> {
   return listOf(result)
@@ -46,6 +44,9 @@ interface LXFVideoCacheHostApi {
   /** 转换为缓存代理URL */
   fun convertToCacheProxyUrl(url: String): String
 
+  /** 获取转码地址 */
+  fun getTranscodeUrl(openurl: String, headers: Map<String, String>): String
+
   companion object {
     /** The codec used by LXFVideoCacheHostApi. */
     val codec: MessageCodec<Any?> by lazy {
@@ -55,6 +56,28 @@ interface LXFVideoCacheHostApi {
     @Suppress("UNCHECKED_CAST")
     fun setUp(binaryMessenger: BinaryMessenger, api: LXFVideoCacheHostApi?) {
       run {
+
+        val transChannel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.video_cache.LXFVideoCacheHostApi.getTranscodeUrl", codec)
+        if (api!= null) {
+          transChannel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val openurlArg = args[0] as String
+            val headersArg = args[1] as Map<String, String>
+            var wrapped: List<Any?>
+
+            Thread(Runnable {
+              try {
+                wrapped = listOf<Any?>(api.getTranscodeUrl(openurlArg, headersArg))
+              } catch (exception: Throwable) {
+                wrapped = wrapError(exception)
+              }
+              reply.reply(wrapped)
+            }).start()
+          }
+        }else {
+          transChannel.setMessageHandler(null)
+        }
+
         val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.video_cache.LXFVideoCacheHostApi.convertToCacheProxyUrl", codec)
         if (api != null) {
           channel.setMessageHandler { message, reply ->
