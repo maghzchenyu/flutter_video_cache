@@ -11,6 +11,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
+import org.json.JSONObject
 import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
@@ -88,13 +89,12 @@ class LXFVideoCacheHostApiImplementation(
     }
 
     override fun onCacheAvailable(cacheFile: File?, url: String?, percentsAvailable: Int) {
-        val result = mapOf(
-            "path" to cacheFile?.path,
-            "url" to url,
-            "percentsAvailable" to percentsAvailable,
-        )
-        Log.d(VIDEO_CACHE_TAG,"url = $url percentsAvailable = $percentsAvailable")
-        cacheMethondChannel.invokeMethod("onCacheAvailable", result)
+        val obj = JSONObject()
+        obj.put("path", cacheFile?.path)
+        obj.put("url", url)
+        obj.put("percentsAvailable", percentsAvailable)
+        Log.d(VIDEO_CACHE_TAG,"onCacheAvailable url = $url percentsAvailable = $percentsAvailable")
+        cacheMethondChannel.invokeMethod("onCacheAvailable", obj.toString())
     }
 }
 
